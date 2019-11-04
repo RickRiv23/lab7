@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Pixabay Search (Express Version) </title>
+        <link rel="stylesheet" href="/styles.css" type="text/css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <body>
+
+        <h1> Pixabay Search Results </h1>
+        
+        <form action="/results">
+            
+            <div>
+                <label for="keyword">
+                    Keyword: <input type="text" name="keyword">
+                </label>
+                <input id="submitBtn" type="submit" value="Search" >
+            </div>
+            <br>
+            <div>
+                <label for="orientation"> Select Orientation: 
+                    <select id="orientation">
+                        <option name="orientation" value="">Select One</option>
+                        <option name="orientation" value="vertical">Vertical</option>
+                        <option name="orientation" value="horizontal">Horizontal</option>
+                    </select>
+                </label>
+                <input id="selectOrientation" type="text" name="selectOrientation" hidden>
+            </div>
+            
+        </form> <br><br>
+        
+        <div id="images">
+            <% for(var i=0; i < 4; i++) { %>
+               <figure>
+                    <figcaption> Likes: <%=images[i].likes %> </figcaption>
+                    <img id="image<%=i%>" src="<%=images[i].url%>" alt="<%=images[i].tags%>"/>
+                </figure>
+            <% } %>
+        </div>
+        
+        <script type="text/javascript" src="/scripts.js"></script>
+    </body>
+</html>

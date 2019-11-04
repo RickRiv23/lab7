@@ -1,64 +1,75 @@
+/* global $*/
 const express = require("express");
 const app = express();
 app.set("view engine", "ejs");
-app.use(express.static("public")); //folder for images, css, js
+app.use(express.static("assets")); //folder for images, css, js
 
 const request = require('request');
 
 //routes
 app.get("/", async function(req, res){
     
- let parsedData = await getImages();
- let randNum = Math.floor(Math.random() * 20);
- 
- console.dir("parsedData: " + parsedData); //displays content of the object
+    let parsedData = await getImages("whales","horizontal");
     
- res.render("index", {"image":parsedData.hits[randNum].largeImageURL});
-            
+    console.dir("parsedData: " + JSON.stringify(parsedData)); //displays content of the object
+    // console.dir(req.body);
+    
+    res.render("index", {"images":parsedData});
 }); //root route
 
 
-app.get("/results", function(req, res){
+app.get("/results", async function(req, res){
     
-    let parsedData = "";
- 
- request('https://pixabay.com/api/?key=10288928-e28258c7c61a0cd6e8cfdd031',
-             function (error, response, body) {
+    //console.dir(req);
+    let keyword = req.query.keyword; //gets the value that the user typed in the form using the GET method
+    let orientation = req.query.selectOrientation;
+    
+    let parsedData = await getImages(keyword, orientation);
+    
+    console.dir("parsedData: " + JSON.stringify(parsedData)); //displays content of the object
+    console.dir(req.query);
+    
 
-        if (!error && response.statusCode == 200  ) { //no issues in the request
-            
-             parsedData = JSON.parse(body); //converts string to JSON
-            
-            let randomIndex = Math.floor(Math.random() * parsedData.hits.length);
-            //res.send(`<img src='${parsedData.hits[randomIndex].largeImageURL}'>`);
-            res.render("results", {"images":parsedData});
-            
-        } else {
-            console.log(response.statusCode);
-            console.log(error);
-        }
-
-   });//request
-    
-    
-    //res.render("results");
+    res.render("results", {"images":parsedData});
     
 });//results route
 
 
+// let imageData = {};
+                 
+// for(let i=0; i<4; i++ ){
+//     let randomIndex = Math.floor(Math.random() * parsedData.hits.length);
+//     imageData[i] = {
+//         "likes": parsedData.hits[randomIndex].likes,
+//         "tags": parsedData.hits[randomIndex].tags,
+//         "url": parsedData.hits[randomIndex].largeImageURL
+//     };
+// };
+
 //Returns all data from the Pixabay API as JSON format
-function getImages(){
+function getImages(keyword,orientation){
     
     
     return new Promise( function(resolve, reject){
-        request('https://pixabay.com/api/?key=10288928-e28258c7c61a0cd6e8cfdd031',
+        request('https://pixabay.com/api/?key=5589438-47a0bca778bf23fc2e8c5bf3e&q='+keyword+'&orientation='+orientation,
                  function (error, response, body) {
     
             if (!error && response.statusCode == 200  ) { //no issues in the request
                 
                  let parsedData = JSON.parse(body); //converts string to JSON
                  
-                 resolve(parsedData);
+                 let imageData = {};
+                 
+                 for(let i=0; i<4; i++ ){
+                    let randomIndex = Math.floor(Math.random() * parsedData.hits.length);
+                    imageData[i] = {
+                        "likes": parsedData.hits[randomIndex].likes,
+                        "tags": parsedData.hits[randomIndex].tags,
+                        "url": parsedData.hits[randomIndex].largeImageURL
+                    };
+                 };
+                 
+                 resolve(imageData);
                 
                 //let randomIndex = Math.floor(Math.random() * parsedData.hits.length);
                 //res.send(`<img src='${parsedData.hits[randomIndex].largeImageURL}'>`);
